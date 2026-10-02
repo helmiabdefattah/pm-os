@@ -13,13 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // App\Providers\TenancyServiceProvider::mapRoutes().
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // 'tenant' is a middleware GROUP (referenced by routes/tenant.php):
-        // identify the tenant from the request domain and block tenant routes
-        // from being served on the central (SaaS) domains.
-        $middleware->appendToGroup('tenant', [
-            \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
-            \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
-        ]);
+        // Tenant routes reference the stancl tenancy middleware classes
+        // directly (see routes/tenant.php) instead of a named group, so no
+        // 'tenant' group is registered here — a group name leaks into the
+        // terminate phase and throws "Class \"tenant\" does not exist".
 
         // 'central_admin' alias (referenced by routes/web.php admin routes).
         $middleware->alias([
