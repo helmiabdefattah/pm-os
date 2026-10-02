@@ -9,6 +9,7 @@ use App\Core\MultiTenancy\Models\Tenant;
 use Database\Seeders\TenantDatabaseSeeder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
 use Throwable;
 
 /**
@@ -49,7 +50,9 @@ class CreateTenant extends Command
         // Resolve plan (optional)
         $plan = null;
         if ($planRef = $this->option('plan')) {
-            $plan = Plan::where('slug', $planRef)->orWhere('id', $planRef)->first();
+            $plan = Plan::where('slug', $planRef)
+                ->when(Str::isUuid($planRef), fn ($q) => $q->orWhere('id', $planRef))
+                ->first();
             if (! $plan) {
                 $this->error("Plan [{$planRef}] not found. Seed plans first: php artisan db:seed --class=PlanSeeder");
 
@@ -86,7 +89,7 @@ class CreateTenant extends Command
             ['Identifier', $identifier],
             ['Name', $tenant->name],
             ['Domain', $domain],
-            ['Database', $tenant->database()],
+            ['Database', $tenant->database()->getName()],
             ['Plan', $plan?->slug ?? '—'],
             ['Status', $tenant->status],
         ]);
