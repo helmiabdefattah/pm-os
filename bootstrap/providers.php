@@ -2,7 +2,7 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-    // Register your module / tenancy service providers here, e.g.:
-    // App\Providers\TenancyServiceProvider::class,
+    App\Providers\TenancyServiceProvider::class,
+    // Register your module service providers here, e.g.:
     // Modules\PropertyOnboarding\Providers\PropertyOnboardingServiceProvider::class,
 ];

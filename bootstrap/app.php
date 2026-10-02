@@ -3,20 +3,14 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
-        then: function () {
-            // Tenant web routes (stancl/tenancy). The file applies its own
-            // ['web', 'tenant'] middleware stack internally.
-            if (file_exists($tenant = base_path('routes/tenant.php'))) {
-                Route::group([], $tenant);
-            }
-        },
+        // Tenant routes (routes/tenant.php) are mapped by
+        // App\Providers\TenancyServiceProvider::mapRoutes().
     )
     ->withMiddleware(function (Middleware $middleware) {
         // Custom middleware aliases used by the route files.
