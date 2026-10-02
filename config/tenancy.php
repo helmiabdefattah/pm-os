@@ -39,6 +39,10 @@ return [
     | كل شركة إدارة أملاك = قاعدة بيانات مستقلة
     */
     'database' => [
+        // Central connection used for SaaS data and as the template for
+        // dynamically-created tenant connections (stancl/tenancy).
+        'central_connection' => env('TENANCY_CENTRAL_CONNECTION', 'central'),
+
         'prefix' => env('TENANCY_DB_PREFIX', 'pm_tenant_'),
         'suffix' => '',
 
