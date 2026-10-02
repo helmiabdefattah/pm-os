@@ -13,15 +13,18 @@ return Application::configure(basePath: dirname(__DIR__))
         // App\Providers\TenancyServiceProvider::mapRoutes().
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Custom middleware aliases used by the route files.
-        // NOTE: the 'tenant' and 'central_admin' classes below are referenced
-        // by routes/tenant.php and routes/web.php but do not exist yet — create
-        // them (or adjust these targets) before those routes are requested.
-        //
-        // $middleware->alias([
-        //     'tenant'        => \App\Http\Middleware\InitializeTenancy::class,
-        //     'central_admin' => \App\Http\Middleware\EnsureCentralAdmin::class,
-        // ]);
+        // 'tenant' is a middleware GROUP (referenced by routes/tenant.php):
+        // identify the tenant from the request domain and block tenant routes
+        // from being served on the central (SaaS) domains.
+        $middleware->appendToGroup('tenant', [
+            \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+            \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
+        ]);
+
+        // 'central_admin' alias (referenced by routes/web.php admin routes).
+        $middleware->alias([
+            'central_admin' => \App\Http\Middleware\EnsureCentralAdmin::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
